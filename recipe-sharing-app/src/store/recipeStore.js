@@ -4,14 +4,19 @@ export const useRecipeStore = create((set) => ({
   recipes: [],
   searchTerm: '',
   filteredRecipes: [],
+  favorites: [],
+  recommendations: [],
 
   addRecipe: (newRecipe) =>
-    set((state) => ({
-      recipes: [...state.recipes, newRecipe],
-      filteredRecipes: [...state.recipes, newRecipe].filter((r) =>
-        r.title.toLowerCase().includes(state.searchTerm.toLowerCase())
-      ),
-    })),
+    set((state) => {
+      const updated = [...state.recipes, newRecipe];
+      return {
+        recipes: updated,
+        filteredRecipes: updated.filter((r) =>
+          r.title.toLowerCase().includes(state.searchTerm.toLowerCase())
+        ),
+      };
+    }),
 
   deleteRecipe: (id) =>
     set((state) => {
@@ -21,6 +26,7 @@ export const useRecipeStore = create((set) => ({
         filteredRecipes: updated.filter((r) =>
           r.title.toLowerCase().includes(state.searchTerm.toLowerCase())
         ),
+        favorites: state.favorites.filter((fid) => fid !== id),
       };
     }),
 
@@ -44,4 +50,12 @@ export const useRecipeStore = create((set) => ({
         r.title.toLowerCase().includes(term.toLowerCase())
       ),
     })),
-}));
+
+  addFavorite: (id) =>
+    set((state) => ({
+      favorites: state.favorites.includes(id)
+        ? state.favorites
+        : [...state.favorites, id],
+    })),
+
+  removeFavorit

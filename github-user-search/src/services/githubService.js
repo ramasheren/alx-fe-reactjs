@@ -9,8 +9,17 @@ const githubAPI = axios.create({
   },
 });
 
-// Single user fetch by username
-export const fetchUserData = async (username) => {
-  const response = await githubAPI.get(`/users/${username}`);
+// Advanced user search using query parameters
+export const searchUsers = async ({ username, location, minRepos }) => {
+  let query = '';
+
+  if (username) query += `${username} in:login`;
+  if (location) query += ` location:${location}`;
+  if (minRepos) query += ` repos:>=${minRepos}`;
+
+  const response = await githubAPI.get(`/search/users`, {
+    params: { q: query.trim() },
+  });
+
   return response.data;
 };

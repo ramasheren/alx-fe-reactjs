@@ -1,26 +1,33 @@
 // src/services/githubService.js
 
-const BASE_URL = "https://api.github.com";
+// Advanced GitHub API integration
 
+/**
+ * Search GitHub users by query.
+ * This uses the full API URL as required: "https://api.github.com/search/users?q"
+ */
 export const searchUsers = async (query) => {
   try {
-    const response = await fetch(`${BASE_URL}/search/users?q=${encodeURIComponent(query)}`);
+    const response = await fetch(`https://api.github.com/search/users?q=${encodeURIComponent(query)}`);
     
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    return data.items; // returns an array of users
+    return data.items;
   } catch (error) {
     console.error("Error fetching users:", error.message);
     throw error;
   }
 };
 
+/**
+ * Get full user profile by username.
+ */
 export const getUserDetails = async (username) => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${username}`);
+    const response = await fetch(`https://api.github.com/users/${username}`);
 
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
@@ -33,9 +40,12 @@ export const getUserDetails = async (username) => {
   }
 };
 
+/**
+ * Get public repositories for a user.
+ */
 export const getUserRepos = async (username) => {
   try {
-    const response = await fetch(`${BASE_URL}/users/${username}/repos`);
+    const response = await fetch(`https://api.github.com/users/${username}/repos`);
 
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);

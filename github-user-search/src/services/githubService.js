@@ -1,15 +1,25 @@
 // src/services/githubService.js
 
-// Advanced GitHub API integration
-
 /**
- * Search GitHub users by query.
- * This uses the full API URL as required: "https://api.github.com/search/users?q"
+ * Search GitHub users using advanced filters like location and minRepos.
+ * - location: user location (e.g., "Egypt")
+ * - minRepos: minimum number of public repositories (e.g., 10)
  */
-export const searchUsers = async (query) => {
+export const searchUsers = async ({ query = "", location = "", minRepos = 0 }) => {
   try {
-    const response = await fetch(`https://api.github.com/search/users?q=${encodeURIComponent(query)}`);
-    
+    let searchQuery = query;
+
+    if (location) {
+      searchQuery += ` location:${location}`;
+    }
+
+    if (minRepos) {
+      searchQuery += ` repos:>${minRepos}`;
+    }
+
+    const apiUrl = `https://api.github.com/search/users?q=${encodeURIComponent(searchQuery)}`;
+    const response = await fetch(apiUrl);
+
     if (!response.ok) {
       throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
     }
@@ -23,37 +33,29 @@ export const searchUsers = async (query) => {
 };
 
 /**
- * Get full user profile by username.
+ * Get detailed GitHub user info.
  */
 export const getUserDetails = async (username) => {
   try {
     const response = await fetch(`https://api.github.com/users/${username}`);
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error("Failed to fetch user details");
     return await response.json();
   } catch (error) {
-    console.error("Error fetching user details:", error.message);
+    console.error(error);
     throw error;
   }
 };
 
 /**
- * Get public repositories for a user.
+ * Get public repositories of a user.
  */
 export const getUserRepos = async (username) => {
   try {
     const response = await fetch(`https://api.github.com/users/${username}/repos`);
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error("Failed to fetch repos");
     return await response.json();
   } catch (error) {
-    console.error("Error fetching user repositories:", error.message);
+    console.error(error);
     throw error;
   }
 };

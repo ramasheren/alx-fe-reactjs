@@ -1,25 +1,49 @@
-import axios from 'axios';
+// src/services/githubService.js
 
-const apiKey = import.meta.env.VITE_APP_GITHUB_API_KEY;
+const BASE_URL = "https://api.github.com";
 
-const githubAPI = axios.create({
-  baseURL: 'https://api.github.com',
-  headers: {
-    ...(apiKey && { Authorization: `token ${apiKey}` }),
-  },
-});
+export const searchUsers = async (query) => {
+  try {
+    const response = await fetch(`${BASE_URL}/search/users?q=${encodeURIComponent(query)}`);
+    
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+    }
 
-// Advanced user search using query parameters
-export const searchUsers = async ({ username, location, minRepos }) => {
-  let query = '';
+    const data = await response.json();
+    return data.items; // returns an array of users
+  } catch (error) {
+    console.error("Error fetching users:", error.message);
+    throw error;
+  }
+};
 
-  if (username) query += `${username} in:login`;
-  if (location) query += ` location:${location}`;
-  if (minRepos) query += ` repos:>=${minRepos}`;
+export const getUserDetails = async (username) => {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${username}`);
 
-  const response = await githubAPI.get(`/search/users`, {
-    params: { q: query.trim() },
-  });
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+    }
 
-  return response.data;
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user details:", error.message);
+    throw error;
+  }
+};
+
+export const getUserRepos = async (username) => {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${username}/repos`);
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user repositories:", error.message);
+    throw error;
+  }
 };

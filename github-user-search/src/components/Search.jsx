@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { searchUsers } from '../services/githubService';
+import { searchUsers } from '../services/githubService';
+
+const handleSearch = async () => {
+  try {
+    const users = await searchUsers(searchQuery);
+    setResults(users);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 function Search() {
   const [username, setUsername] = useState('');

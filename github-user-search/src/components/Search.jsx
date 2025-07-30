@@ -39,13 +39,22 @@ function Search() {
       </form>
 
       {loading && <p>Loading...</p>}
-      {error && <p>Looks like we can't find the user.</p>}
+      {error && <p>Looks like we cant find the user</p>}
 
       {userData && (
         <div className="user-card p-4 border rounded shadow">
-          <img src={userData.avatar_url} alt={userData.login} className="w-24 h-24 rounded-full" />
+          <img
+            src={userData.avatar_url}
+            alt={userData.login}
+            className="w-24 h-24 rounded-full"
+          />
           <h2 className="text-xl font-bold">{userData.name || userData.login}</h2>
-          <a href={userData.html_url} target="_blank" rel="noopener noreferrer" className="text-blue-600">
+          <a
+            href={userData.html_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600"
+          >
             View GitHub Profile
           </a>
         </div>

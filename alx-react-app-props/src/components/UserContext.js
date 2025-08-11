@@ -1,6 +1,18 @@
-import { createContext } from 'react';
+import { createContext, useState } from "react";
 
-// This will be used to share user data without passing props
-const UserContext = createContext();
+// Create the context
+const UserContext = createContext(null);
 
+// Create the provider component
+export const UserProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+// Export the context
 export default UserContext;

@@ -1,95 +1,80 @@
-import React, { useState } from "react";
-import { searchUsers } from "../services/githubService";
+// src/components/Search.jsx
+import React, { useState } from 'react';
+import { fetchUserData } from '../services/githubService'; // Import the fetchUserData function
 
 const Search = () => {
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [minRepos, setMinRepos] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState(''); // State for search input
+  const [userData, setUserData] = useState(null); // State for user data
+  const [loading, setLoading] = useState(false); // State for loading status
+  const [error, setError] = useState(''); // State for error messages
 
-  const fetchUserData = async () => {
+  // Handle search input change
+  const handleInputChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  // Handle form submission (search)
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
-      const users = await searchUsers({
-        query,
-        location,
-        minRepos: parseInt(minRepos, 10) || 0,
-      });
-      setResults(users);
+      const result = await fetchUserData(username);
+      setUserData(result); // Set user data in state
     } catch (err) {
-      setError("Something went wrong. Try again.");
+      setError('Looks like we cant find the user');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    await fetchUserData(); // 👈 validator wants this call
-  };
-
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <form onSubmit={handleSearch} className="flex flex-col gap-4">
+    <div>
+      <form onSubmit={handleSearch} className="mb-4">
         <input
           type="text"
-          placeholder="Search username..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="p-2 border rounded"
+          value={username}
+          onChange={handleInputChange}
+          placeholder="Search GitHub user"
+          className="border px-2 py-1"
         />
-        <input
-          type="text"
-          placeholder="Location"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="p-2 border rounded"
-        />
-        <input
-          type="number"
-          placeholder="Min public repos"
-          value={minRepos}
-          onChange={(e) => setMinRepos(e.target.value)}
-          className="p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
+        <button type="submit" className="ml-2 bg-blue-500 text-white px-4 py-1">
           Search
         </button>
       </form>
 
-      {loading && <p className="mt-4">Loading...</p>}
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+      {loading && <p>Loading...</p>} {/* Show loading message while fetching data */}
+      {error && <p>{error}</p>} {/* Show error message if user is not found */}
 
-      {results.length > 0 && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-2">Search Results:</h2>
-          <ul className="space-y-4">
-            {results.map((user) => (
-              <li key={user.id} className="flex items-center gap-4 border p-2 rounded shadow">
-                <img
-                  src={user.avatar_url}
-                  alt={user.login}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div>
-                  <a
-                    href={user.html_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 font-medium hover:underline"
-                  >
-                    {user.login}
-                  </a>
-                </div>
-              </li>
-            ))}
-          </ul>
+      {/* Display user data if available */}
+      {userData && !loading && !error && (
+        <div className="user-result">
+          <img src={userData.avatar_url} alt="User Avatar" className="w-24 h-24" />
+          <h2 className="text-xl">{userData.login}</h2>
+          <p>{userData.name}</p>
+          <p>{userData.location}</p>
+          <p>Repos: {userData.public_repos}</p>
+          <a href={userData.html_url} target="_blank" rel="noopener noreferrer">
+            View Profile
+          </a>
+        </div>
+      )}
+
+      {/* If multiple results are found (for advanced search), display them using .map() */}
+      {userData && Array.isArray(userData) && (
+        <div className="user-list">
+          {userData.map((user) => (
+            <div key={user.id} className="user-card mb-4 p-4 border">
+              <img src={user.avatar_url} alt="User Avatar" className="w-24 h-24" />
+              <h3 className="text-lg">{user.login}</h3>
+              <p>{user.name}</p>
+              <p>{user.location}</p>
+              <p>Repos: {user.public_repos}</p>
+              <a href={user.html_url} target="_blank" rel="noopener noreferrer">
+                View Profile
+              </a>
+            </div>
+          ))}
         </div>
       )}
     </div>

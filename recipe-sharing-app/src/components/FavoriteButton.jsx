@@ -1,19 +1,24 @@
-import { useRecipeStore } from '../store/recipeStore';
+import React from 'react';
+import { useRecipeStore } from '../recipeStore';
 
-const FavoriteButton = ({ id }) => {
+const FavoriteButton = ({ recipeId }) => {
   const favorites = useRecipeStore((state) => state.favorites);
   const addFavorite = useRecipeStore((state) => state.addFavorite);
   const removeFavorite = useRecipeStore((state) => state.removeFavorite);
 
-  const isFavorite = favorites.includes(id);
+  const isFavorited = favorites.includes(recipeId);
 
-  const toggleFavorite = () => {
-    isFavorite ? removeFavorite(id) : addFavorite(id);
+  const handleClick = () => {
+    if (isFavorited) {
+      removeFavorite(recipeId);
+    } else {
+      addFavorite(recipeId);
+    }
   };
 
   return (
-    <button onClick={toggleFavorite}>
-      {isFavorite ? '★ Remove Favorite' : '☆ Add to Favorites'}
+    <button onClick={handleClick}>
+      {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
     </button>
   );
 };
